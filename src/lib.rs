@@ -3,6 +3,7 @@
 //! # Examples
 //!
 //! ```rust
+//! #[macro_use]
 //! extern crate pkg;
 //!
 //! fn main() {
@@ -18,9 +19,16 @@
 //! release channel for more optimal implementations.
 
 #![deny(missing_docs, warnings)]
+#![cfg_attr(test, feature(test))]
 
 #[macro_use]
 extern crate lazy_static;
+
+#[cfg(test)]
+extern crate test;
+
+//#[cfg(feature = "build")]
+pub mod build;
 
 /// Macro for getting the crate `name` from the cargo manifest.
 ///
