@@ -1,0 +1,21 @@
+[package]
+name = "pkg"
+version = "0.1.0"
+authors = ["Juici <juicy66173@gmail.com>"]
+description = "A small utility library for binary applications"
+
+homepage = "https://github.com/Juici/pkg-rs"
+repository = "https://github.com/Juici/pkg-rs"
+readme = "README.md"
+license = "MIT"
+
+keywords = ["cargo", "package"]
+categories = ["development-tools"]
+
+include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
+
+[dependencies]
+lazy_static = "1.0"
+
+[features]
+nightly = ["lazy_static/nightly"]
