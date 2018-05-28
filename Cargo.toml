@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 
 keywords = ["cargo", "package"]
-categories = ["development-tools", "no-std"]
+categories = ["development-tools"]
 
 include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
