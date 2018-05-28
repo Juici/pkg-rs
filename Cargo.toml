@@ -14,11 +14,8 @@ categories = ["development-tools", "no-std"]
 
 include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
-[dependencies.lazy_static]
-version = "1.0"
-optional = true
+[dependencies]
+lazy_static = "1.0"
 
 [features]
-default = ["lazy"]
-
-lazy = ["lazy_static"]
+nightly = ["lazy_static/nightly"]
