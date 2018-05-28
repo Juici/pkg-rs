@@ -6,7 +6,7 @@
 //! extern crate pkg;
 //!
 //! fn main() {
-//!     println!("{} {}\n{}", pkg::name(), pkg::version(), pkg::description());
+//!     println!("{} {}\n{}", pkg_name!(), pkg_version!(), pkg_description!());
 //! }
 //! ```
 //!
@@ -64,9 +64,6 @@ macro_rules! pkg_version {
 ///
 /// The resulting `&str` is the join of all the authors by semicolons. If there
 /// is only one author the result will be that author.
-///
-/// To get a slice of the authors look at the [authors](fn.authors.html)
-/// function.
 ///
 /// # Examples
 ///
