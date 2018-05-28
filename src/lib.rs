@@ -1,6 +1,6 @@
 //! A small utility library for binary applications.
 //!
-//! # Example
+//! # Examples
 //!
 //! ```rust
 //! extern crate pkg;
@@ -17,7 +17,7 @@
 //! - `nightly`: This uses language features only available on the nightly
 //! release channel for more optimal implementations.
 
-#![deny(warnings)]
+#![deny(missing_docs, warnings)]
 
 #[macro_use]
 extern crate lazy_static;
@@ -40,7 +40,7 @@ lazy_static! {
 
 /// Returns the crate name.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
@@ -60,7 +60,7 @@ pub fn name() -> &'static str {
 /// The crate only has the one author, otherwise this will return the list of
 /// authors separated by semicolons.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
@@ -73,15 +73,15 @@ pub fn author() -> &'static str {
     pkg_authors!()
 }
 
-/// Returns a slice of the crate authors.
+/// Returns a slice reference of the crate authors.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
 ///
 /// fn main() {
-///     println!("The crate authors are {}", pkg::authors().join(", "));
+///     println!("The crate authors are: {}", pkg::authors().join(", "));
 /// }
 /// ```
 pub fn authors() -> &'static [&'static str] {
@@ -90,7 +90,7 @@ pub fn authors() -> &'static [&'static str] {
 
 /// Returns the crate version.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
@@ -105,7 +105,7 @@ pub fn version() -> &'static str {
 
 /// Returns the crate description.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
@@ -120,7 +120,7 @@ pub fn description() -> &'static str {
 
 /// Returns the crate homepage.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
@@ -135,7 +135,7 @@ pub fn homepage() -> &'static str {
 
 /// Returns the name of the binary file.
 ///
-/// # Example
+/// # Examples
 ///
 /// ```rust
 /// extern crate pkg;
