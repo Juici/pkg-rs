@@ -1,4 +1,21 @@
 //! A small utility library for binary applications.
+//!
+//! # Example
+//!
+//! ```rust
+//! extern crate pkg;
+//!
+//! fn main() {
+//!     println!("{} {}\n{}", pkg::name(), pkg::version(), pkg::description());
+//! }
+//! ```
+//!
+//! # Cargo features
+//!
+//! This crate provides one cargo feature:
+//!
+//! - `nightly`: This uses language features only available on the nightly
+//! release channel for more optimal implementations.
 
 #![deny(warnings)]
 
@@ -22,6 +39,16 @@ lazy_static! {
 }
 
 /// Returns the crate name.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate name is {}", pkg::name());
+/// }
+/// ```
 pub fn name() -> &'static str {
     pkg_name!()
 }
@@ -31,32 +58,95 @@ pub fn name() -> &'static str {
 /// # Assumption
 ///
 /// The crate only has the one author, otherwise this will return the list of
-/// authors separated by `;`.
+/// authors separated by semicolons.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate author is {}", pkg::author());
+/// }
+/// ```
 pub fn author() -> &'static str {
     pkg_authors!()
 }
 
 /// Returns a slice of the crate authors.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate authors are {}", pkg::authors().join(", "));
+/// }
+/// ```
 pub fn authors() -> &'static [&'static str] {
     &*AUTHORS
 }
 
 /// Returns the crate version.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate version is {}", pkg::version());
+/// }
+/// ```
 pub fn version() -> &'static str {
     pkg_version!()
 }
 
 /// Returns the crate description.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate description is {}", pkg::description());
+/// }
+/// ```
 pub fn description() -> &'static str {
     pkg_description!()
 }
 
 /// Returns the crate homepage.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate homepage is {}", pkg::homepage());
+/// }
+/// ```
 pub fn homepage() -> &'static str {
     pkg_homepage!()
 }
 
 /// Returns the name of the binary file.
+///
+/// # Example
+///
+/// ```rust
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!(
+///         "The binary file name is {}",
+///         pkg::bin_name().unwrap_or("unknown")
+///     );
+/// }
+/// ```
 pub fn bin_name() -> Option<&'static str> {
     match *BIN_NAME {
         Some(ref name) => Some(name),
