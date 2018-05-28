@@ -6,7 +6,7 @@
 //! extern crate pkg;
 //!
 //! fn main() {
-//!     println!("{} {}\n{}", pkg::name(), pkg::version(), pkg::description());
+//!     println!("{} {}\n{}", pkg_name!(), pkg_version!(), pkg_description!());
 //! }
 //! ```
 //!
@@ -22,11 +22,105 @@
 #[macro_use]
 extern crate lazy_static;
 
-#[macro_use]
-mod macros;
+/// Macro for getting the crate `name` from the cargo manifest.
+///
+/// # Examples
+///
+/// ```rust
+/// #[macro_use]
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate name is {}", pkg_name!());
+/// }
+/// ```
+#[macro_export]
+macro_rules! pkg_name {
+    () => {
+        env!("CARGO_PKG_NAME")
+    };
+}
+
+/// Macro for getting the crate `version` from the cargo manifest.
+///
+/// # Examples
+///
+/// ```rust
+/// #[macro_use]
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate version is {}", pkg_version!());
+/// }
+/// ```
+#[macro_export]
+macro_rules! pkg_version {
+    () => {
+        env!("CARGO_PKG_VERSION")
+    };
+}
+
+/// Macro for getting the crate `authors` from the cargo manifest.
+///
+/// The resulting `&str` is the join of all the authors by semicolons. If there
+/// is only one author the result will be that author.
+///
+/// # Examples
+///
+/// ```rust
+/// #[macro_use]
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate authors are {}", pkg_authors!());
+/// }
+/// ```
+#[macro_export]
+macro_rules! pkg_authors {
+    () => {
+        env!("CARGO_PKG_AUTHORS")
+    };
+}
+
+/// Macro for getting the crate `description` from the cargo manifest.
+///
+/// # Examples
+///
+/// ```rust
+/// #[macro_use]
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate name is {}", pkg_name!());
+/// }
+/// ```
+#[macro_export]
+macro_rules! pkg_description {
+    () => {
+        env!("CARGO_PKG_DESCRIPTION")
+    };
+}
+
+/// Macro for getting the crate `homepage` from the cargo manifest.
+///
+/// # Examples
+///
+/// ```rust
+/// #[macro_use]
+/// extern crate pkg;
+///
+/// fn main() {
+///     println!("The crate name is {}", pkg_name!());
+/// }
+/// ```
+#[macro_export]
+macro_rules! pkg_homepage {
+    () => {
+        env!("CARGO_PKG_HOMEPAGE")
+    };
+}
 
 lazy_static! {
-    static ref AUTHORS: Vec<&'static str> = pkg_authors!().split(';').collect();
     static ref BIN_NAME: Option<String> = {
         use std::env;
         use std::path::PathBuf;
@@ -36,101 +130,6 @@ lazy_static! {
         let file_name = path.file_stem()?;
         Some(file_name.to_str()?.to_owned())
     };
-}
-
-/// Returns the crate name.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate name is {}", pkg::name());
-/// }
-/// ```
-pub fn name() -> &'static str {
-    pkg_name!()
-}
-
-/// Returns the crate author.
-///
-/// # Assumption
-///
-/// The crate only has the one author, otherwise this will return the list of
-/// authors separated by semicolons.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate author is {}", pkg::author());
-/// }
-/// ```
-pub fn author() -> &'static str {
-    pkg_authors!()
-}
-
-/// Returns a slice reference of the crate authors.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate authors are: {}", pkg::authors().join(", "));
-/// }
-/// ```
-pub fn authors() -> &'static [&'static str] {
-    &*AUTHORS
-}
-
-/// Returns the crate version.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate version is {}", pkg::version());
-/// }
-/// ```
-pub fn version() -> &'static str {
-    pkg_version!()
-}
-
-/// Returns the crate description.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate description is {}", pkg::description());
-/// }
-/// ```
-pub fn description() -> &'static str {
-    pkg_description!()
-}
-
-/// Returns the crate homepage.
-///
-/// # Examples
-///
-/// ```rust
-/// extern crate pkg;
-///
-/// fn main() {
-///     println!("The crate homepage is {}", pkg::homepage());
-/// }
-/// ```
-pub fn homepage() -> &'static str {
-    pkg_homepage!()
 }
 
 /// Returns the name of the binary file.
