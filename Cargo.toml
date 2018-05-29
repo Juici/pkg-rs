@@ -1,6 +1,6 @@
 [package]
 name = "pkg"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Juici <juicy66173@gmail.com>"]
 description = "A small utility library for binary applications"
 
