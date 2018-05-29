@@ -27,7 +27,7 @@ extern crate lazy_static;
 #[cfg(test)]
 extern crate test;
 
-//#[cfg(feature = "build")]
+#[cfg(feature = "build")]
 pub mod build;
 
 /// Macro for getting the crate `name` from the cargo manifest.
