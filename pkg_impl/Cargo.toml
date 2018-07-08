@@ -13,12 +13,3 @@ workspace = ".."
 
 [lib]
 proc-macro = true
-
-[dependencies.syn]
-version = "0.14"
-default-features = false
-features = ["derive", "parsing"]
-
-[dependencies.proc-macro2]
-version = "0.4"
-features = ["nightly"]
