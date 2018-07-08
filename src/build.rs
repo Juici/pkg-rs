@@ -76,10 +76,8 @@ impl GitCommit {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::process::Command;
-    use test::Bencher;
-
-    use super::git_commit;
 
     // Note: whilst this is not the same method to obtain the hash, the resulting
     // value is the same and individually this is faster.
@@ -142,23 +140,6 @@ mod tests {
             .ok()?
             .stdout;
         String::from_utf8(vec).ok()
-    }
-
-    #[bench]
-    fn bench_git_commit_individual(b: &mut Bencher) {
-        b.iter(|| {
-            git_hash();
-            git_author_name();
-            git_author_email();
-            git_date();
-            git_subject();
-            git_body();
-        });
-    }
-
-    #[bench]
-    fn bench_git_commit(b: &mut Bencher) {
-        b.iter(|| git_commit());
     }
 
     #[test]
