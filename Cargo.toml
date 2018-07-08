@@ -1,6 +1,6 @@
 [package]
 name = "pkg"
-version = "1.1.0"
+version = "2.0.0-alpha.1"
 authors = ["Juici <juicy66173@gmail.com>"]
 description = "A small utility library for binary applications"
 
@@ -15,9 +15,12 @@ categories = ["development-tools"]
 
 include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
-[dependencies]
-lazy_static = "1.0"
+[workspace]
+members = ["pkg_impl"]
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["nightly"]
 
 [features]
-nightly = ["lazy_static/nightly"]
 build = []
