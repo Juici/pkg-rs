@@ -10,25 +10,20 @@
 //!     println!("{} {}\n{}", pkg_name!(), pkg_version!(), pkg_description!());
 //! }
 //! ```
-//!
-//! # Cargo features
-//!
-//! This crate provides one cargo feature:
-//!
-//! - `nightly`: This uses language features only available on the nightly
-//! release channel for more optimal implementations.
 
 #![deny(missing_docs, warnings)]
 #![cfg_attr(test, feature(test))]
+#![feature(proc_macro)]
 
 #[macro_use]
 extern crate lazy_static;
-
-#[cfg(test)]
-extern crate test;
+extern crate pkg_impl;
 
 #[cfg(feature = "build")]
 pub mod build;
+
+#[doc(hidden)]
+pub use pkg_impl::authors as _authors;
 
 /// Macro for getting the crate `name` from the cargo manifest.
 ///
@@ -70,24 +65,31 @@ macro_rules! pkg_version {
 
 /// Macro for getting the crate `authors` from the cargo manifest.
 ///
-/// The resulting `&str` is the join of all the authors by semicolons. If there
-/// is only one author the result will be that author.
+/// Returns a `&[&str]` slice of the authors.
 ///
 /// # Examples
 ///
 /// ```rust
+/// #![feature(proc_macro_non_items, use_extern_macros)]
+///
 /// #[macro_use]
 /// extern crate pkg;
 ///
 /// fn main() {
-///     println!("The crate authors are {}", pkg_authors!());
+///     println!("The crate authors are {:?}", pkg_authors!());
 /// }
 /// ```
+///
+/// # Notes
+///
+/// This macro requires the `proc_macro_non_items` and `use_extern_macros`
+/// crate attributes.
 #[macro_export]
 macro_rules! pkg_authors {
-    () => {
-        env!("CARGO_PKG_AUTHORS")
-    };
+    () => {{
+        let authors: &[&str] = $crate::_authors!();
+        authors
+    }};
 }
 
 /// Macro for getting the crate `description` from the cargo manifest.
