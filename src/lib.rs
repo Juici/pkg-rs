@@ -5,13 +5,17 @@
 
 extern crate core;
 
+mod version;
+
 #[cfg(feature = "build")]
 pub mod build;
 
-mod version;
-
 #[doc(hidden)]
 pub use core::env as __env;
+
+#[doc(hidden)]
+#[proc_macro_hack::proc_macro_hack]
+pub use pkg_macros::authors as __authors;
 
 /// Expands to the crate name.
 ///
@@ -39,6 +43,31 @@ macro_rules! version {
     () => {
         $crate::__env!("CARGO_PKG_VERSION")
     };
+}
+
+/// Expands to the crate authors.
+///
+/// # Examples
+///
+/// Basic usage:
+/// ```
+/// const AUTHORS: &[&str] = pkg::authors!();
+/// ```
+///
+/// Joined string:
+/// ```
+/// const AUTHORS: &str = pkg::authors!(", ");
+/// ```
+#[macro_export]
+macro_rules! authors {
+    ($join:literal) => {{
+        let authors: &'static str = $crate::__authors!($join);
+        authors
+    }};
+    () => {{
+        let authors: &'static [&'static str] = $crate::__authors!();
+        authors
+    }};
 }
 
 /// Expands to the crate description.
