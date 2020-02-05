@@ -12,9 +12,10 @@ proc-macro = true
 [features]
 default = []
 
+git = ["git2"]
+
 # Build script utilities.
 build = []
-git = ["build", "git2"]
 
 [dependencies]
 proc-macro2 = "1.0"

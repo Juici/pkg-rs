@@ -7,6 +7,7 @@ use std::env;
 use proc_macro2::Span;
 use proc_macro_hack::proc_macro_hack;
 use quote::quote;
+use syn::parse::Nothing;
 use syn::{parse_macro_input, Error};
 
 use crate::parse::AuthorsInput;
@@ -41,4 +42,29 @@ pub fn authors(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     };
 
     output.into()
+}
+
+#[cfg(feature = "git")]
+#[proc_macro]
+pub fn git_commit(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let _ = parse_macro_input!(input as Nothing);
+
+    let _commit = match git_commit_info() {
+        Ok(repo) => repo,
+        Err(err) => return Error::new(Span::call_site(), err).to_compile_error().into(),
+    };
+
+    proc_macro::TokenStream::new()
+}
+
+#[cfg(feature = "git")]
+fn git_commit_info() -> Result<(), git2::Error> {
+    use git2::Repository;
+
+    let repo = Repository::open(".")?;
+
+    let head = repo.head()?;
+    let _commit = head.peel_to_commit()?;
+
+    Ok(())
 }

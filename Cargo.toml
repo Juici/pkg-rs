@@ -21,11 +21,12 @@ all-features = true
 members = ["pkg-macros"]
 
 [features]
-default =  []
+default =  ["git"]
+
+git = ["pkg-macros/git"]
 
 # Build script utilities.
 build = ["pkg-macros/build"]
-git = ["build", "pkg-macros/git"]
 
 [dependencies]
 pkg-macros = { path = "./pkg-macros" }
