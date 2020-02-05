@@ -28,5 +28,5 @@ build = ["pkg-macros/build"]
 git = ["build", "pkg-macros/git"]
 
 [dependencies]
-pkg-macros = { path = "./pkg-macros" }
+pkg-macros = { version = "3.0.0", path = "./pkg-macros" }
 proc-macro-hack = "0.5"
