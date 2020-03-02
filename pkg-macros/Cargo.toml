@@ -21,7 +21,7 @@ proc-macro2 = "1.0"
 proc-macro-hack = "0.5"
 quote = "1.0"
 
-git2 = { version = "0.11", optional = true }
+git2 = { version = "0.12", optional = true }
 
 [dependencies.syn]
 version = "1.0"
