@@ -1,21 +1,9 @@
 //! A small utility library for binary applications.
 
 #![no_std]
-#![deny(missing_docs, warnings)]
-
-extern crate core;
-
-mod version;
-
-#[cfg(feature = "build")]
-pub mod build;
 
 #[doc(hidden)]
 pub use core::env as __env;
-
-#[doc(hidden)]
-#[proc_macro_hack::proc_macro_hack]
-pub use pkg_macros::authors as __authors;
 
 /// Expands to the crate name.
 ///
@@ -56,19 +44,9 @@ macro_rules! version {
 ///
 /// Joined string:
 /// ```
-/// const AUTHORS: &str = pkg::authors!(", ");
+/// const AUTHORS: &str = pkg::authors!("\n");
 /// ```
-#[macro_export]
-macro_rules! authors {
-    ($join:literal) => {{
-        let authors: &'static str = $crate::__authors!($join);
-        authors
-    }};
-    () => {{
-        let authors: &'static [&'static str] = $crate::__authors!();
-        authors
-    }};
-}
+pub use pkg_macros::authors;
 
 /// Expands to the crate description.
 ///
@@ -109,5 +87,61 @@ macro_rules! homepage {
 macro_rules! repository {
     () => {
         $crate::__env!("CARGO_PKG_REPOSITORY")
+    };
+}
+
+/// Expands to the crate major version.
+///
+/// # Examples
+///
+/// ```
+/// const VERSION_MAJOR: &str = pkg::version_major!();
+/// ```
+#[macro_export]
+macro_rules! version_major {
+    () => {
+        $crate::__env!("CARGO_PKG_VERSION_MAJOR")
+    };
+}
+
+/// Expands to the crate minor version.
+///
+/// # Examples
+///
+/// ```
+/// const VERSION_MINOR: &str = pkg::version_minor!();
+/// ```
+#[macro_export]
+macro_rules! version_minor {
+    () => {
+        $crate::__env!("CARGO_PKG_VERSION_MINOR")
+    };
+}
+
+/// Expands to the crate patch version.
+///
+/// # Examples
+///
+/// ```
+/// const VERSION_PATCH: &str = pkg::version_patch!();
+/// ```
+#[macro_export]
+macro_rules! version_patch {
+    () => {
+        $crate::__env!("CARGO_PKG_VERSION_PATCH")
+    };
+}
+
+/// Expands to the crate pre-release version.
+///
+/// # Examples
+///
+/// ```
+/// const VERSION_PRE: &str = pkg::version_pre!();
+/// ```
+#[macro_export]
+macro_rules! version_pre {
+    () => {
+        $crate::__env!("CARGO_PKG_VERSION_PRE")
     };
 }
