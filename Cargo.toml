@@ -3,9 +3,9 @@ name = "pkg"
 version = "3.0.0"
 authors = ["James Whaley <juicy66173@gmail.com>"]
 description = "A small utility library for binary applications."
-license = "MIT"
+edition = "2021"
+license = "MIT or Apache-2.0"
 readme = "README.md"
-edition = "2018"
 
 documentation = "https://docs.rs/pkg"
 homepage = "https://github.com/Juici/pkg-rs"
@@ -14,19 +14,14 @@ repository = "https://github.com/Juici/pkg-rs"
 keywords = ["cargo", "package"]
 categories = ["development-tools"]
 
-[package.metadata.docs.rs]
-all-features = true
-
-[workspace]
-members = ["pkg-macros"]
-
 [features]
-default =  []
+default = ["bin_name"]
 
-# Build script utilities.
-build = ["pkg-macros/build"]
-git = ["build", "pkg-macros/git"]
+bin_name = ["once_cell"]
 
 [dependencies]
-pkg-macros = { version = "3.0.0", path = "./pkg-macros" }
-proc-macro-hack = "0.5"
+pkg-macros = { version = "=3.0.0", path = "macros" }
+once_cell = { version = "1.9", optional = true, features = ["parking_lot"] }
+
+[workspace]
+members = ["macros"]
