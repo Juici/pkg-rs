@@ -1,147 +1,28 @@
 //! A small utility library for binary applications.
 
-#![no_std]
+mod macros;
 
 #[doc(hidden)]
-pub use core::env as __env;
-
-/// Expands to the crate name.
-///
-/// # Examples
-///
-/// ```
-/// const NAME: &str = pkg::name!();
-/// ```
-#[macro_export]
-macro_rules! name {
-    () => {
-        $crate::__env!("CARGO_PKG_NAME")
-    };
+pub mod __private {
+    pub use pkg_macros as macros;
+    pub use std;
 }
 
-/// Expands to the full crate version.
-///
-/// # Examples
-///
-/// ```
-/// const VERSION: &str = pkg::version!();
-/// ```
-#[macro_export]
-macro_rules! version {
-    () => {
-        $crate::__env!("CARGO_PKG_VERSION")
-    };
-}
+/// Returns the name of the binary as determined a runtime.
+#[cfg(feature = "bin_name")]
+pub fn bin_name() -> Option<&'static str> {
+    use std::env;
+    use std::path::Path;
 
-/// Expands to the crate authors.
-///
-/// # Examples
-///
-/// Basic usage:
-/// ```
-/// const AUTHORS: &[&str] = pkg::authors!();
-/// ```
-///
-/// Joined string:
-/// ```
-/// const AUTHORS: &str = pkg::authors!("\n");
-/// ```
-pub use pkg_macros::authors;
+    use once_cell::sync::Lazy;
 
-/// Expands to the crate description.
-///
-/// # Examples
-///
-/// ```
-/// const DESCRIPTION: &str = pkg::description!();
-/// ```
-#[macro_export]
-macro_rules! description {
-    () => {
-        $crate::__env!("CARGO_PKG_DESCRIPTION")
-    };
-}
+    static BIN_NAME: Lazy<Option<String>> = Lazy::new(|| {
+        let argv0 = env::args_os().next()?;
 
-/// Expands to the crate homepage URL.
-///
-/// # Examples
-///
-/// ```
-/// const HOMEPAGE: &str = pkg::homepage!();
-/// ```
-#[macro_export]
-macro_rules! homepage {
-    () => {
-        $crate::__env!("CARGO_PKG_HOMEPAGE")
-    };
-}
+        let p = Path::new(&argv0);
+        let s = p.file_name()?.to_str()?;
 
-/// Expands to the crate homepage URL.
-///
-/// # Examples
-///
-/// ```
-/// const REPOSITORY: &str = pkg::repository!();
-/// ```
-#[macro_export]
-macro_rules! repository {
-    () => {
-        $crate::__env!("CARGO_PKG_REPOSITORY")
-    };
-}
-
-/// Expands to the crate major version.
-///
-/// # Examples
-///
-/// ```
-/// const VERSION_MAJOR: &str = pkg::version_major!();
-/// ```
-#[macro_export]
-macro_rules! version_major {
-    () => {
-        $crate::__env!("CARGO_PKG_VERSION_MAJOR")
-    };
-}
-
-/// Expands to the crate minor version.
-///
-/// # Examples
-///
-/// ```
-/// const VERSION_MINOR: &str = pkg::version_minor!();
-/// ```
-#[macro_export]
-macro_rules! version_minor {
-    () => {
-        $crate::__env!("CARGO_PKG_VERSION_MINOR")
-    };
-}
-
-/// Expands to the crate patch version.
-///
-/// # Examples
-///
-/// ```
-/// const VERSION_PATCH: &str = pkg::version_patch!();
-/// ```
-#[macro_export]
-macro_rules! version_patch {
-    () => {
-        $crate::__env!("CARGO_PKG_VERSION_PATCH")
-    };
-}
-
-/// Expands to the crate pre-release version.
-///
-/// # Examples
-///
-/// ```
-/// const VERSION_PRE: &str = pkg::version_pre!();
-/// ```
-#[macro_export]
-macro_rules! version_pre {
-    () => {
-        $crate::__env!("CARGO_PKG_VERSION_PRE")
-    };
+        Some(s.to_owned())
+    });
+    BIN_NAME.as_deref()
 }

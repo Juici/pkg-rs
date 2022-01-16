@@ -14,8 +14,14 @@ repository = "https://github.com/Juici/pkg-rs"
 keywords = ["cargo", "package"]
 categories = ["development-tools"]
 
+[features]
+default = ["bin_name"]
+
+bin_name = ["once_cell"]
+
 [dependencies]
 pkg-macros = { version = "=3.0.0", path = "macros" }
+once_cell = { version = "1.9", optional = true, features = ["parking_lot"] }
 
 [workspace]
 members = ["macros"]
