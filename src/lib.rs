@@ -1,4 +1,4 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 mod internal;
 
@@ -8,6 +8,7 @@ mod semver;
 #[cfg(feature = "semver")]
 pub use crate::semver::Version;
 
+// Private internals used in some compile-time constant macros.
 #[doc(hidden)]
 pub mod __private {
     #[doc(hidden)]
@@ -201,4 +202,61 @@ macro_rules! authors {
 
         AUTHORS_STR
     }};
+}
+
+/// Expands to the name of the binary that is being compiled.
+///
+/// If the target being compiled is not a binary, then the result of the
+/// expanded expression will be `None`.
+///
+/// # Note
+///
+/// If the binary is renamed after being compiled or symlinked to with a
+/// different name then this will not reflect that change. For that case use
+/// the [`bin_name`] function to get the name of the executable at runtime.
+///
+/// # Example
+///
+/// ```
+/// const BIN_NAME: Option<&str> = pkg::bin_name!();
+/// ```
+#[macro_export]
+macro_rules! bin_name {
+    () => {{
+        const BIN_NAME: Option<&str> = ::core::option_env!("CARGO_BIN_NAME");
+        BIN_NAME
+    }};
+}
+
+/// Returns the name of the binary executable as determined at runtime.
+///
+/// # Example
+///
+/// ```
+/// let bin_name = pkg::bin_name().expect("cannot determine binary name");
+///
+/// println!("the name of the current binary is {bin_name}");
+/// ```
+#[cfg(feature = "rt_bin_name")]
+pub fn bin_name() -> Option<&'static str> {
+    use std::env;
+    use std::path::PathBuf;
+
+    use once_cell::sync::OnceCell;
+
+    static BIN_NAME: OnceCell<Option<Box<str>>> = OnceCell::new();
+
+    let bin_name = BIN_NAME.get_or_init(|| {
+        let current_exe = match env::args_os().next() {
+            Some(exe) => PathBuf::from(exe),
+            None => env::current_exe().ok()?,
+        };
+
+        let file = current_exe.file_name()?;
+        let name = file.to_string_lossy();
+
+        Some(name.into_owned().into_boxed_str())
+    });
+
+    bin_name.as_deref()
 }

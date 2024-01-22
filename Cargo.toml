@@ -12,7 +12,12 @@ repository = "https://github.com/Juici/pkg-rs"
 keywords = ["cargo", "package"]
 categories = ["development-tools"]
 
-[features]
-default = ["semver"]
+[dependencies]
+once_cell = { version = "1", optional = true }
 
+[features]
+default = ["semver", "rt_bin_name"]
+
+std = []
 semver = []
+rt_bin_name = ["once_cell", "std"]
