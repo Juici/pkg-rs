@@ -51,7 +51,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: [nightly, beta, stable, 1.64.0]
+        rust: [nightly, beta, stable, 1.71.0]
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +66,7 @@ jobs:
         run: echo RUSTFLAGS=${RUSTFLAGS}\ --cfg=pkg_nightly_testing >> $GITHUB_ENV
         if: matrix.rust == 'nightly'
       - run: cargo test --workspace
+      - run: cargo check --no-default-features
 
   minimal:
     name: Minimal versions

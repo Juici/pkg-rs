@@ -1,21 +1,31 @@
+//! This library provides utilities for getting build information.
+
+#![cfg_attr(doc_cfg, feature(doc_cfg))]
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::module_name_repetitions)]
 
-mod internal;
-
-#[cfg(feature = "semver")]
+mod authors;
 mod semver;
+mod str;
 
-#[cfg(feature = "semver")]
+#[cfg(feature = "git")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "git")))]
+pub mod git;
+
 pub use crate::semver::Version;
 
-// Private internals used in some compile-time constant macros.
 #[doc(hidden)]
 pub mod __private {
+    //! Private internals used in some macros.
+
     #[doc(hidden)]
-    pub use crate::internal::slice_str;
-    #[doc(hidden)]
-    pub use crate::internal::split_on;
+    pub use crate::authors::{authors, count_authors, join_authors, join_authors_buf_len};
 }
+
+/// Timestamp of the build as seconds from the Unix epoch.
+#[cfg(feature = "proc-macros")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "proc-macros")))]
+pub const BUILD_TIME: i64 = pkg_macros::build_time!();
 
 /// Expands to the name of the calling package.
 ///
@@ -57,13 +67,11 @@ macro_rules! version {
 #[macro_export]
 macro_rules! description {
     () => {{
-        const DESCRIPTION: &str = ::core::env!("CARGO_PKG_DESCRIPTION");
-
-        if DESCRIPTION.is_empty() {
-            None
-        } else {
-            Some(DESCRIPTION)
-        }
+        const DESCRIPTION: Option<&str> = match ::core::env!("CARGO_PKG_DESCRIPTION") {
+            desc if !desc.is_empty() => Some(desc),
+            _ => None,
+        };
+        DESCRIPTION
     }};
 }
 
@@ -83,168 +91,54 @@ macro_rules! description {
 #[macro_export]
 macro_rules! authors {
     () => {{
-        // Cargo separates the names of authors with the colon ':' character.
-        //
-        // eg. "author1:author2:author3"
-        const AUTHORS_SEP: u8 = b':';
         const AUTHORS_STR: &str = ::core::env!("CARGO_PKG_AUTHORS");
 
-        // Count the number of authors.
-        const AUTHORS_LEN: usize = {
-            let mut n = 0;
-
-            let mut remaining = AUTHORS_STR;
-
-            while !remaining.is_empty() {
-                let (author, rest) = $crate::__private::split_on(remaining, AUTHORS_SEP);
-
-                if !author.is_empty() {
-                    n += 1;
-                }
-
-                remaining = rest;
-            }
-
-            n
-        };
-
-        // Slice `AUTHORS_BYTES` up into the names of each author.
-        const AUTHORS: [&str; AUTHORS_LEN] = {
-            let mut authors = [""; AUTHORS_LEN];
-
-            let mut i = 0;
-            let mut remaining = AUTHORS_STR;
-
-            while !remaining.is_empty() {
-                let (author, rest) = $crate::__private::split_on(remaining, AUTHORS_SEP);
-
-                if !author.is_empty() {
-                    authors[i] = author;
-                    i += 1;
-                }
-
-                remaining = rest;
-            }
-
-            authors
-        };
+        const N_AUTHORS: usize = $crate::__private::count_authors(AUTHORS_STR);
+        const AUTHORS: [&str; N_AUTHORS] = $crate::__private::authors(AUTHORS_STR);
 
         &AUTHORS
     }};
     ($sep:expr) => {{
-        // Assert that `$sep` is a compile-time constant string.
         const SEP: &str = $sep;
-
         const AUTHORS: &[&str] = $crate::authors!();
 
-        // Calculate the buffer length required to hold the string
-        // created by joining `AUTHORS` with the `SEP` string.
-        const BUF_LEN: usize = {
-            let mut len = 0;
-            let mut i = 0;
+        const BUF_LEN: usize = $crate::__private::join_authors_buf_len(AUTHORS, SEP);
+        const BUF: [u8; BUF_LEN] = $crate::__private::join_authors(AUTHORS, SEP);
 
-            while i < AUTHORS.len() {
-                if i > 0 {
-                    len += SEP.len();
-                }
-                len += AUTHORS[i].len();
-                i += 1;
-            }
-
-            len
-        };
-
-        // Manually create a buffer the equivalent of `AUTHORS.join(SEP).as_bytes()`.
-        const BUF: [u8; BUF_LEN] = {
-            let mut buf = [0; BUF_LEN];
-
-            let mut offset = 0;
-            let mut i = 0;
-
-            while i < AUTHORS.len() {
-                let author = AUTHORS[i].as_bytes();
-
-                // Add a separator if this is not the first author.
-                if i > 0 {
-                    let mut j = 0;
-
-                    // Copy the bytes of `SEP` into the buffer.
-                    while j < SEP.len() {
-                        buf[offset] = SEP.as_bytes()[j];
-
-                        offset += 1;
-                        j += 1;
-                    }
-                }
-
-                {
-                    let mut j = 0;
-
-                    // Copy the bytes of `author` into the buffer.
-                    while j < author.len() {
-                        buf[offset] = author[j];
-
-                        offset += 1;
-                        j += 1;
-                    }
-                }
-
-                i += 1;
-            }
-
-            buf
-        };
-
-        const AUTHORS_STR: &str = match ::core::str::from_utf8(&BUF) {
+        const AUTHORS_JOINED: &str = match ::core::str::from_utf8(&BUF) {
             Ok(s) => s,
-            Err(_) => panic!("invalid utf-8"),
+            Err(_) => ::core::panic!("invalid utf-8"),
         };
 
-        AUTHORS_STR
-    }};
-}
-
-/// Expands to the name of the binary that is being compiled.
-///
-/// If the target being compiled is not a binary, then the result of the
-/// expanded expression will be `None`.
-///
-/// # Note
-///
-/// If the binary is renamed after being compiled or symlinked to with a
-/// different name then this will not reflect that change. For that case use
-/// the [`bin_name`] function to get the name of the executable at runtime.
-///
-/// # Example
-///
-/// ```
-/// const BIN_NAME: Option<&str> = pkg::bin_name!();
-/// ```
-#[macro_export]
-macro_rules! bin_name {
-    () => {{
-        const BIN_NAME: Option<&str> = ::core::option_env!("CARGO_BIN_NAME");
-        BIN_NAME
+        AUTHORS_JOINED
     }};
 }
 
 /// Returns the name of the binary executable as determined at runtime.
 ///
+/// # Notes
+///
+/// Any non-Unicode sequences are replaced with
+/// [`U+FFFD REPLACEMENT CHARACTER`][U+FFFD] (�).
+///
+/// [U+FFFD]: char::REPLACEMENT_CHARACTER
+///
 /// # Example
 ///
 /// ```
-/// let bin_name = pkg::bin_name().expect("cannot determine binary name");
-///
-/// println!("the name of the current binary is {bin_name}");
+/// match pkg::bin_name() {
+///     Some(name) => println!("name of this binary is: {name}"),
+///     None => println!("failed to get name of binary"),
+/// }
 /// ```
-#[cfg(feature = "rt_bin_name")]
+#[cfg(feature = "std")]
+#[cfg_attr(doc_cfg, doc(cfg(feature = "std")))]
 pub fn bin_name() -> Option<&'static str> {
     use std::env;
     use std::path::PathBuf;
+    use std::sync::OnceLock;
 
-    use once_cell::sync::OnceCell;
-
-    static BIN_NAME: OnceCell<Option<Box<str>>> = OnceCell::new();
+    static BIN_NAME: OnceLock<Option<Box<str>>> = OnceLock::new();
 
     let bin_name = BIN_NAME.get_or_init(|| {
         let current_exe = match env::args_os().next() {
@@ -252,7 +146,7 @@ pub fn bin_name() -> Option<&'static str> {
             None => env::current_exe().ok()?,
         };
 
-        let file = current_exe.file_name()?;
+        let file = current_exe.file_stem()?;
         let name = file.to_string_lossy();
 
         Some(name.into_owned().into_boxed_str())

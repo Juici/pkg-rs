@@ -1,23 +1,40 @@
 [package]
 name = "pkg"
-version = "3.0.0"
-authors = ["James Whaley <juicy66173@gmail.com>"]
+version.workspace = true
+authors.workspace = true
 description = "Utility macros and functions for crates."
-edition = "2021"
-license = "MIT OR Apache-2.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
 
-documentation = "https://docs.rs/pkg"
-repository = "https://github.com/Juici/pkg-rs"
+repository.workspace = true
 
 keywords = ["cargo", "package"]
 categories = ["development-tools"]
 
-[dependencies]
-once_cell = { version = "1", optional = true }
-
 [features]
-default = ["semver", "rt_bin_name"]
-
+default = ["std", "proc-macros", "git"]
 std = []
-semver = []
-rt_bin_name = ["once_cell", "std"]
+proc-macros = ["pkg-macros"]
+git = ["proc-macros", "pkg-macros?/git"]
+
+[dependencies]
+pkg-macros = { version = "=4.0.0", path = "macros", optional = true }
+
+[workspace]
+members = ["macros"]
+resolver = "2"
+
+[workspace.package]
+version = "4.0.0"
+authors = ["James Whaley <juicy66173@gmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.71"
+
+repository = "https://github.com/Juici/pkg-rs"
+
+[package.metadata.docs.rs]
+all-features = true
+targets = ["x86_64-unknown-linux-gnu"]
+rustdoc-args = ["--cfg", "doc_cfg", "--generate-link-to-definition"]
